@@ -1,0 +1,33 @@
+name: .NET Build Release
+
+on:
+  push:
+    branches:
+      - release # Trigger the workflow on push events to the release branch
+
+jobs:
+  build:
+    runs-on: windows-latest # Specify the runner. .NET typically runs on Windows, but you can change this as needed.
+
+    steps:
+    - uses: actions/checkout@v2 # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x' # Specify the .NET version to use.
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish --configuration Release --no-restore --output ./publish
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: myapp
+        path: ./publish/**
